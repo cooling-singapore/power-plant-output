@@ -1,0 +1,156 @@
+INFO:root:[PROGRAM START] at 11.03.22, 23:23.
+Initialization commencing. 
+ ---------------------------------------------------------------
+INFO:root:dh.Metadata options set upon data import:
+	warn_no_units 	True
+	allow_timegaps	False
+	allow_subres  	True
+	warn_subres   	False
+	subres_th     	0.1
+	allow_nan     	False
+
+WARNING:root:dh.Metadata: sub res ALLOWED
+
+INFO:root:Unit defn file read: Pint energy defn.txt
+INFO:root:--------------------------------------------------------------- Reading fundamentals
+INFO:root:Read file: System demand 2015-2020 MW.pkl successfully (units checked).
+INFO:root:Read file: SGDperUSD_weekly_ave_16 - 20 new.pkl successfully (units checked).
+INFO:root:Reading fundamentals -- fuels
+INFO:root:Read file: WB JKM LNG (01.15-03.21)_2.pkl successfully (units checked).
+INFO:root:Read file: Henry Hub daily '15-'20.xlsx successfully (units checked).
+INFO:root:Read file: WB Crude, Dubai (01.15-05.21)_2.pkl successfully (units checked).
+INFO:root:Read file: WB Crude, Brent (01.15-05.21)_2.pkl successfully (units checked).
+INFO:root:Read file: WB Crude, WTI (01.15-05.21)_2.pkl successfully (units checked).
+INFO:root:Read file: WB Coal, Australia (01.15-05.21)_2.pkl successfully (units checked).
+INFO:root:--------------------------------------------------------------- Reading gen parameters -- efficiency curves
+INFO:root:Read file: Part load efficiency, CCGT GT26.pkl successfully (units checked).
+INFO:root:Read file: Part load efficiency, CCGT Best.pkl successfully (units checked).
+INFO:root:Read file: Part load efficiency, ST sample.pkl successfully (units checked).
+INFO:root:Read file: Part load efficiency, CCGT Typical.pkl successfully (units checked).
+INFO:root:Read file: Part load efficiency, CCGT 4000F.pkl successfully (units checked).
+INFO:root:Read file: Part load efficiency, CCGT 9F.05.pkl successfully (units checked).
+INFO:root:Read file: Part load efficiency, CCGT 701F.pkl successfully (units checked).
+INFO:root:--------------------------------------------------------------- Reading HHV table
+INFO:root:Read file: Higher heating values.csv successfully (units checked).
+INFO:root:--------------------------------------------------------------- Reading LHV table
+INFO:root:Read file: Lower heating values.csv successfully (units checked).
+INFO:root:--------------------------------------------------------------- Reading fuel densities
+INFO:root:Read file: Fuel densities.csv successfully (units checked).
+INFO:root:------------------------------------------------------ Reading cogen alternative boiler efficiencies
+INFO:root:Read file: Cogen alternative boiler efficiencies.csv successfully (units checked).
+INFO:root:Read input complete.
+
+INFO:root:Initialized 26 GenUnit(s) from the power plant database at 'C:\Users\tepang\Desktop\Test3\Inputs and resources\SG power plant database v3_w_status.xlsx'.
+
+INFO:root:GenUnit settings from config:
+	minbid_size       	1
+	bid_precision     	1
+	currency_precision	2
+
+INFO:root:Interpolating the efficiency curves.
+
+INFO:root:Seeking the common period in fundamentals input.
+INFO:root:dh.get_common_period() returns: (2016-01-01 00:00:00, 2020-12-31 23:30:00)
+INFO:root:Found common period (1827 days) in the fundamentals data.
+	From: 	2016 Jan 01
+	To: 	2020 Dec 31
+
+INFO:root:market period duration: 0 days 00:30:00
+INFO:root:Calculating fuel conversion factors (fqty to MWh)
+INFO:root:Successfully converted the ff. fuels as:
+
+              Fuel denominated by HHV Used rho Used
+Fuel ID                                            
+LNG (JKM)                  energy      NaN      NaN
+PNG (HH)                   energy      NaN      NaN
+Crude (Dubai)              volume    Crude  more_md
+Crude (Brent)              volume    Crude  more_md
+Crude (WTI)                volume    Crude  more_md
+Coal (AU)                    mass  more_md      NaN
+INFO:root:Read file: WtE Monthly Ave Load.pkl successfully (units checked).
+INFO:root:Initialization successful.
+---------------------------------------------------------------
+WARNING:root:Development Notes: 
+	- No Non-Fuel Costs in .calc_TotalCosts()
+	- if Po < Pmin, assume that ne is that of Pmin
+	- Cogen HPR assumed constant
+	- WtE cost structure not implemented
+	- Fuel presets hardcoded when calculating latent heat factors
+
+INFO:root:SIMULATION TIME: set to [2016 Jan 01,  2016 Dec 31] (366 days).
+
+INFO:root:[11.03.22, 23:23] Market simulation launched for [2016 Jan 01 to 2016 Dec 31]
+
+Scenarios:
+	sys demand	Baseline
+
+INFO:root:Start NEMS pre-simulation
+INFO:root:Calculating stochastic components:
+INFO:root: - Full load electrical efficiency potential sampled.
+INFO:root: - Generator outages solved.
+INFO:root:SIMULATION TIME: set to [2016 Jan 01,  2016 Dec 31] (366 days).
+
+INFO:root:[11.03.22, 23:25] Market simulation launched for [2016 Jan 01 to 2016 Dec 31]
+
+Scenarios:
+	sys demand	Baseline
+
+INFO:root:Start NEMS pre-simulation
+INFO:root:Calculating stochastic components:
+INFO:root: - Full load electrical efficiency potential sampled.
+INFO:root: - Generator outages solved.
+INFO:root:SIMULATION TIME: set to [2016 Jan 01,  2016 Dec 31] (366 days).
+
+INFO:root:[11.03.22, 23:26] Market simulation launched for [2016 Jan 01 to 2016 Dec 31]
+
+Scenarios:
+	sys demand	Baseline
+
+INFO:root:Start NEMS pre-simulation
+INFO:root:Calculating stochastic components:
+INFO:root: - Full load electrical efficiency potential sampled.
+INFO:root: - Generator outages solved.
+INFO:hyperopt.tpe:build_posterior_wrapper took 0.086755 seconds
+INFO:hyperopt.tpe:TPE using 0 trials
+INFO:root:SIMULATION TIME: set to [2016 Jan 01,  2016 Dec 31] (366 days).
+
+INFO:root:[11.03.22, 23:28] Market simulation launched for [2016 Jan 01 to 2016 Dec 31]
+
+Scenarios:
+	sys demand	Baseline
+
+INFO:root:Start NEMS pre-simulation
+INFO:root:Calculating stochastic components:
+INFO:root: - Full load electrical efficiency potential sampled.
+INFO:root: - Generator outages solved.
+INFO:root:SIMULATION TIME: set to [2016 Jan 01,  2016 Dec 31] (366 days).
+
+INFO:root:[11.03.22, 23:29] Market simulation launched for [2016 Jan 01 to 2016 Dec 31]
+
+Scenarios:
+	sys demand	Baseline
+
+INFO:root:Start NEMS pre-simulation
+INFO:root:Calculating stochastic components:
+INFO:root: - Full load electrical efficiency potential sampled.
+INFO:root: - Generator outages solved.
+INFO:root:SIMULATION TIME: set to [2016 Jan 01,  2016 Dec 31] (366 days).
+
+INFO:root:[11.03.22, 23:30] Market simulation launched for [2016 Jan 01 to 2016 Dec 31]
+
+Scenarios:
+	sys demand	Baseline
+
+INFO:root:Start NEMS pre-simulation
+INFO:root:Calculating stochastic components:
+INFO:root: - Full load electrical efficiency potential sampled.
+INFO:root: - Generator outages solved.
+INFO:root:[11.03.22, 23:32] Market simulation launched for [2016 Jan 01 to 2016 Dec 31]
+
+Scenarios:
+	sys demand	Baseline
+
+INFO:root:Start NEMS pre-simulation
+INFO:root:Calculating stochastic components:
+INFO:root: - Full load electrical efficiency potential sampled.
+INFO:root: - Generator outages solved.
