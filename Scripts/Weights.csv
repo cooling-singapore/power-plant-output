@@ -1,0 +1,9 @@
+,Weights
+NG,0.05
+Oil,0.45
+Coal,0.45
+Others,0.05
+RMSE out,0.53
+RMSE in,0.25
+Loss LNG,0.13
+Loss Cogen,0.08
