@@ -1,0 +1,66 @@
+# -------------------------------------------------------------------- Fundamentals
+# 0 decimal prefixes
+kilo- =  1e3   = k-
+mega- =  1e6   = M-
+metric_million- =  1e6   = MM-
+giga- =  1e9   = G-
+tera- =  1e12  = T-
+peta- =  1e15  = P-
+
+
+# 0 fundamental reference
+meter = [length] = m = metre
+second = [time] = s = sec
+gram = [mass] = g
+
+
+# 0 derived reference
+[area] = [length] ** 2
+[volume] = [length] ** 3
+[acceleration] = [length] / [time] ** 2
+[force] = [mass] * [acceleration]
+[energy] = [force] * [length]
+
+
+# 0 other reference
+per_unit = [] = pu
+
+# Currencies as their own dimension
+USD = [USD] = usd
+
+
+
+# -------------------------------------------------------------------- Unit definitions
+# 1 Volume
+liter = 1e-3 * m ** 3 = l = L = litre
+barrel = 158.987295 * L = oil_bbl = bbl
+
+
+# 1 Time
+minute = 60 * second = min
+hour = 60 * minute = hr
+day = 24 * hour
+week = 7 * day
+year = 31556925.9747 * second
+month = year / 12
+
+
+# 1 Mass units
+metric_ton = 1000 * kilogram = t = tonne = ton
+
+# 1 Force
+newton = kilogram * meter / second ** 2 = N
+
+
+# 1 Energy
+joule = newton * meter = J
+btu = 1.05505585262e3 * joule = Btu = BTU = british_thermal_unit
+watt_hour = watt * hour = Wh = watthour
+toe = 41.868e9 * joule = tonne_of_oil_equivalent
+
+
+# 1 Power 
+[power] = [energy] / [time]
+watt = joule / second = W
+
+
