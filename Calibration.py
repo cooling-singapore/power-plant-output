@@ -57,16 +57,16 @@ PERIOD_FROM = '2016 Jan 01'
 PERIOD_TO = '2016 Dec 31'
 FUEL_MIX_IN_PUBLIC = fuel_mix_in_2016 # Input Fuel-Mix Data (ktoe)
 #FUEL_MIX_OUT_PUBLIC = pd.read_csv('2016 Fuel Mix - EMA.csv',index_col=[0]) 
-FUEL_MIX_OUT_PUBLIC = pd.read_csv(path.join(PATHS['Proj'],'Scripts\\2016 Fuel Mix - EMA.csv'),index_col=[0])
+FUEL_MIX_OUT_PUBLIC = pd.read_csv(path.join(PATHS['Proj'],'Scripts','2016 Fuel Mix - EMA.csv'),index_col=[0])
 
 Q_COGEN_UB = Q_cogen_ub_2016    # Get from Sankey Estimate 
 LNG_IMPORT = lng_import_2016    # Whole yr value (in ktoe) from SES
 
 #SCORE_WEIGHTS = pd.read_csv('Weights.csv',index_col=[0]).T
 #PRE_CALIBRATE_PARAMS = pd.read_csv('initial-calibration.csv',index_col=[0]) 
-SCORE_WEIGHTS = pd.read_csv(path.join(PATHS['Proj'],'Scripts\\Weights.csv'),index_col=[0]).T
-INITIAL_PARAMS = pd.read_csv(path.join(PATHS['Proj'],'Scripts\\initial-calibration.csv'),index_col=[0]) 
-CALIBRATION_PARAMS = path.join(PATHS['Proj'],'Scripts\\pre-calibration.csv')
+SCORE_WEIGHTS = pd.read_csv(path.join(PATHS['Proj'],'Scripts','Weights.csv'),index_col=[0]).T
+INITIAL_PARAMS = pd.read_csv(path.join(PATHS['Proj'],'Scripts','initial-calibration.csv'),index_col=[0])
+CALIBRATION_PARAMS = path.join(PATHS['Proj'],'Scripts','pre-calibration.csv')
 
 #CALIBRATION_PARAMS = pd.read_csv(path.join(PATHS['Proj'],'Scripts\\pre-calibration.csv'),index_col=[0]) # Use this to calculate normalize values
 #PRE_CALIBRATE_PARAMS, INITIAL_PARAMS, CALIBRATION_PARAMS
@@ -963,7 +963,7 @@ def save_results(run):
 
     folder = datetime.fromtimestamp(time.time()).strftime("%Y_%B_%d_%H%M_hrs/")
     #to change to 24 hour format, currently 2 pm shows 0200, use %H instead of %I
-    output_path = (PathProj + r'/Scripts/Calibration_output/'+folder)
+    output_path = path.join(PathProj, 'Scripts', 'Calibration_output', folder)
 
     if not os.path.exists(output_path):
         os.makedirs(output_path)
@@ -980,7 +980,7 @@ def save_results(run):
     file_name = output_path+'calibration_results.csv'
     file_name_new = output_path+'calibration_results_new.csv'
     # store_results_old(max_evals).to_csv(file_name, index=False)
-    File_in_progress = path.join(PATHS['Proj'],'Scripts\\In_Progress\\calibration_in_progress.csv')
+    File_in_progress = path.join(PATHS['Proj'],'Scripts', 'In_Progress', 'calibration_in_progress.csv')
     store_results(File_in_progress).to_csv(file_name_new, index=False)
     print('\nCalibration results saved' )
     return
