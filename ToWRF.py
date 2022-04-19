@@ -21,7 +21,7 @@ import sys
 
 # --------------------------------------------------- NEW mandatory init
 PathProj = path.dirname(path.abspath(__file__))
-PATHS = pd.read_pickle(path.join(PathProj, 'PATHS.pkl'))
+PATHS = pd.read_json(path.join(PathProj, 'PATHS.json'), typ='series', orient='records')
 
 # equivalent to gd_analysis.c_
 config = configparser.ConfigParser()

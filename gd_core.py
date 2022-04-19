@@ -25,6 +25,7 @@ import configparser
 import warnings
 import logging
 import atexit
+import json
 from scipy import stats
 
 # DK modules
@@ -1142,7 +1143,8 @@ PPdb, dFundamentals, dGenParameters, dParameters, dStats, \
 time, Scenarios, GenFleet, GenCos, PPdispatchError = __init_sequence()
 
 # Write PATHS.pkl for convenient access
-pd.Series(PATHS).to_pickle(os.path.join(PATHS['Proj'], 'PATHS.pkl'))
+with open(os.path.join(PATHS['Proj'], 'PATHS.json'), 'w') as f:
+	json.dump(json.loads(pd.Series(PATHS).to_json()), f, indent=4)
 
 
 if config['system']['debug'] == 'True':
