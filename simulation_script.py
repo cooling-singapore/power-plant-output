@@ -44,7 +44,7 @@ def update_config(database: str, demand: str):
 
 def initialise_script():
     from gd_core import PATHS
-    from genDispatch import GenFleet, dParameters, set_period, set_scenario
+    from genDispatch import set_period, set_scenario
 
     # FIXME: Set PERIOD as input instead as hardcoded
     # Should calculate based on demand file given
@@ -53,10 +53,10 @@ def initialise_script():
     set_period(t_from=PERIOD_FROM, t_to=PERIOD_TO)
     set_scenario({"sys demand": "Baseline"})
 
-    return PATHS["Proj"], GenFleet, dParameters
+    return PATHS["Proj"]
 
 
-def pre_calibration(output_path: str, runs: int) -> str:
+def pre_calibration(output_path: str, runs: int):
     from Calibration import Pre_Calibration, prepare_save_file
 
     # FIXME: Remove hardcoded paths for 'in_progress' files
@@ -71,8 +71,6 @@ def pre_calibration(output_path: str, runs: int) -> str:
     data = pd.read_csv(progress_file, index_col=[0])
     data.to_csv(pre_calibration_file, index=True)
 
-    return pre_calibration_file
-
 
 def calibration(output_path: str, max_evals: int):
     from Calibration import Calibration, prepare_save_file
@@ -81,20 +79,30 @@ def calibration(output_path: str, max_evals: int):
     progress_file = os.path.join(
         output_path, "In_Progress", "calibration_in_progress.csv"
     )
+
     prepare_save_file(progress_file)
-    Calibration(max_evals, progress_file)
+    best, PARAMS_DFS, RANDSEEDS_DFS = Calibration(max_evals, progress_file)
 
-    return
+    params = PARAMS_DFS[best - 1].copy()
+    seed = RANDSEEDS_DFS[best - 1].copy()
+
+    return params, seed
 
 
-def run_simulation() -> Dict:
+def run_simulation(params, seed):
     from genDispatch import solve
+    from gd_core import PPdb, reinit_fleet
+
+    PPdb["params"] = params
+    PPdb["randseeds"] = seed
+    gen_fleet = reinit_fleet()
 
     results = solve(simulation_name="Baseline", runchecks=False, daily_progress=False)
-    return results
+    return gen_fleet, results
 
 
-def calc_pp_heat(gen_fleet, parameters, results: Dict) -> None:
+def calc_pp_heat(gen_fleet, results: Dict) -> None:
+    from gd_core import dParameters
     from ToWRF import (
         calc_allheat,
         thermal_analysis,
@@ -102,7 +110,7 @@ def calc_pp_heat(gen_fleet, parameters, results: Dict) -> None:
     )
 
     calc_allheat(results)
-    thermal_analysis(gen_fleet, parameters)
+    thermal_analysis(gen_fleet, dParameters)
 
     calc_heatstreams1(
         gen_fleet,
@@ -113,7 +121,7 @@ def calc_pp_heat(gen_fleet, parameters, results: Dict) -> None:
         gen_fleet,
         results,
         by="kind",
-        latentheatfactors=parameters["latent heat factors"],
+        latentheatfactors=dParameters["latent heat factors"],
     )
 
 
@@ -133,18 +141,18 @@ def generate_output(gen_fleet):
 
 def main(database: str, demand: str) -> None:
     update_config(database, demand)
-    paths, gen_fleet, parameters = initialise_script()
+    paths = initialise_script()
     output_path = os.path.join(paths, "Scripts")
 
     # 1. Calibration
     pre_calibration(output_path, 2)
-    calibration(output_path, 3)
+    params, seed = calibration(output_path, 3)
 
     # 2. Simulation
-    results = run_simulation()
+    gen_fleet, results = run_simulation(params, seed)
 
     # 3. Calculate heat
-    calc_pp_heat(gen_fleet, parameters, results)
+    calc_pp_heat(gen_fleet, results)
 
     # 4. Create outputs
     generate_output(gen_fleet)
