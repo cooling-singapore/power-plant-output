@@ -15,6 +15,7 @@ CONFIG_PATH = os.path.join(
 META_PATH = os.path.join(
     os.path.dirname(__file__), "Inputs and resources", "metadata.ini"
 )
+SCENARIO_NAME = "Baseline"
 
 
 def update_config(database: str, demand: str):
@@ -43,17 +44,22 @@ def update_config(database: str, demand: str):
 
 
 def initialise_script():
-    from gd_core import PATHS
-    from genDispatch import set_period, set_scenario
+    from gd_core import PATHS, time
+    from genDispatch import PPdispatchError
+    import Calibration
 
-    # FIXME: Set PERIOD as input instead as hardcoded
-    # Should calculate based on demand file given
-    from Calibration import PERIOD_FROM, PERIOD_TO
+    if PPdispatchError is not None:
+        raise PPdispatchError
 
-    set_period(t_from=PERIOD_FROM, t_to=PERIOD_TO)
-    set_scenario({"sys demand": "Baseline"})
+    # !! Does not work if demand is from other years
+    period = dict(
+        [("start", time["common period"][0]), ("end", time["common period"][1])]
+    )
+    # FIXME: Remove hardcoded value in Calibration
+    Calibration.PERIOD_FROM = period["start"]
+    Calibration.PERIOD_TO = period["end"]
 
-    return PATHS["Proj"]
+    return PATHS["Proj"], period
 
 
 def pre_calibration(output_path: str, runs: int):
@@ -89,15 +95,20 @@ def calibration(output_path: str, max_evals: int):
     return params, seed
 
 
-def run_simulation(params, seed):
-    from genDispatch import solve
+def run_simulation(params, seed, period):
+    from genDispatch import solve, set_scenario, set_period
     from gd_core import PPdb, reinit_fleet
 
     PPdb["params"] = params
     PPdb["randseeds"] = seed
     gen_fleet = reinit_fleet()
 
-    results = solve(simulation_name="Baseline", runchecks=False, daily_progress=False)
+    set_period(period["start"], period["end"])
+    set_scenario({"sys demand": SCENARIO_NAME})
+
+    results = solve(
+        simulation_name=SCENARIO_NAME, runchecks=False, daily_progress=False
+    )
     return gen_fleet, results
 
 
@@ -125,11 +136,11 @@ def calc_pp_heat(gen_fleet, results: Dict) -> None:
     )
 
 
-def generate_output(gen_fleet):
+def generate_output(gen_fleet, period):
     from ToWRF import prep_DUCT_inputs
 
     prep_DUCT_inputs(
-        scenario="baseline",
+        scenario=SCENARIO_NAME,
         GenFleet=gen_fleet,
         PPcells_only=True,
         With_height=True,
@@ -141,7 +152,7 @@ def generate_output(gen_fleet):
 
 def main(database: str, demand: str) -> None:
     update_config(database, demand)
-    paths = initialise_script()
+    paths, period = initialise_script()
     output_path = os.path.join(paths, "Scripts")
 
     # 1. Calibration
@@ -149,13 +160,13 @@ def main(database: str, demand: str) -> None:
     params, seed = calibration(output_path, 3)
 
     # 2. Simulation
-    gen_fleet, results = run_simulation(params, seed)
+    gen_fleet, results = run_simulation(params, seed, period)
 
     # 3. Calculate heat
     calc_pp_heat(gen_fleet, results)
 
     # 4. Create outputs
-    generate_output(gen_fleet)
+    generate_output(gen_fleet, period)
 
 
 if __name__ == "__main__":
