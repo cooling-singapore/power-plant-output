@@ -1,0 +1,8 @@
+pint==0.9
+pandas
+scipy
+scikit-learn
+matplotlib
+fuzzywuzzy
+hyperopt
+openpyxl
