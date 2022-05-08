@@ -1,5 +1,6 @@
 import argparse
 import configparser
+import json
 import re
 import sys
 import os
@@ -137,18 +138,54 @@ def calc_pp_heat(gen_fleet, results: Dict) -> None:
     )
 
 
-def generate_output(gen_fleet, period):
+def to_geojson(dataframe: pd.DataFrame, unit: str) -> Dict:
+    def parse_row(row):
+        long = row["PP Longitude"]
+        lat = row["PP Latitude"]
+        height = row["Height [m]"]
+
+        ah_values = row.filter(regex=r"H\d\d", axis=0).values
+        ah_dict = {f"AH_{i}:{unit}": v for i, v in enumerate(ah_values)}
+
+        feature = {
+            "type": "Feature",
+            "properties": {"height:m": height, **ah_dict},
+            "geometry": {"type": "Point", "coordinates": [long, lat]},
+        }
+
+        return feature
+
+    features = [parse_row(row) for _, row in dataframe.iterrows()]
+    geometries = {
+        "type": "FeatureCollection",
+        "features": features,
+    }
+
+    return geometries
+
+
+def generate_output(gen_fleet, period, unit="MW"):
     from ToWRF import prep_DUCT_inputs
 
-    prep_DUCT_inputs(
-        scenario=SCENARIO_NAME,
-        GenFleet=gen_fleet,
-        PPcells_only=True,
-        With_height=True,
-        unit="MW",
-        day="2016 Apr 15",
-        write_to_disk=True,
-    )
+    output_path = "output"
+
+    os.makedirs(output_path)
+    for _date in pd.date_range(start=period["start"], end=period["end"], freq="D").date:
+        day = _date.strftime("%Y %m %d")
+        WRF_SH, WRF_LH, _, _ = prep_DUCT_inputs(
+            scenario=SCENARIO_NAME,
+            GenFleet=gen_fleet,
+            PPcells_only=True,
+            With_height=True,
+            unit=unit,
+            day=day,
+        )
+
+        day = _date.strftime("%Y%m%d")
+        with open(os.path.join(output_path, f"SH_{day}.geojson"), "w") as f:
+            json.dump(to_geojson(WRF_SH, unit), f, indent=2)
+        with open(os.path.join(output_path, f"LH_{day}.geojson"), "w") as f:
+            json.dump(to_geojson(WRF_LH, unit), f, indent=2)
 
 
 def main(database: str, demand: str) -> None:
