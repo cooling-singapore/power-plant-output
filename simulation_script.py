@@ -9,12 +9,10 @@ import pandas as pd
 
 sys.path.append(".")
 
-CONFIG_PATH = os.path.join(
-    os.path.dirname(__file__), "Inputs and resources", "config.ini"
-)
-META_PATH = os.path.join(
-    os.path.dirname(__file__), "Inputs and resources", "metadata.ini"
-)
+
+INPUT_PATH = os.path.join(os.path.dirname(__file__), "Inputs and resources")
+CONFIG_PATH = os.path.join(INPUT_PATH, "config.ini")
+META_PATH = os.path.join(INPUT_PATH, "metadata.ini")
 SCENARIO_NAME = "Baseline"
 
 
@@ -22,11 +20,14 @@ def update_config(database: str, demand: str):
     """
     Set config and metadata before initalising
     """
+    # Get relative path
+    _database = os.path.relpath(database, INPUT_PATH)
+    _demand = os.path.relpath(demand, os.path.join(INPUT_PATH, "Fundamentals"))
 
     # Update database path
     config = configparser.ConfigParser()
     config.read(CONFIG_PATH)
-    config["paths"]["fp_powerplant_database"] = database
+    config["paths"]["fp_powerplant_database"] = _database
     with open(CONFIG_PATH, "w") as f:
         config.write(f)
 
@@ -37,7 +38,7 @@ def update_config(database: str, demand: str):
 
     # FIXME: Hack to update metadata
     meta["demand"]["system_electricity_MW"] = re.sub(
-        r"(filename=)'.+'", rf"\1'{demand}'", demand_meta
+        r"(filename=)'.+'", rf"\1'{_demand}'", demand_meta
     )
     with open(META_PATH, "w") as f:
         meta.write(f)
