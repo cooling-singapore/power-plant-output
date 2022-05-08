@@ -164,12 +164,10 @@ def to_geojson(dataframe: pd.DataFrame, unit: str) -> Dict:
     return geometries
 
 
-def generate_output(gen_fleet, period, unit="MW"):
+def generate_output(output: str, gen_fleet, period, unit="MW"):
     from ToWRF import prep_DUCT_inputs
 
-    output_path = "output"
-
-    os.makedirs(output_path)
+    os.makedirs(output, exist_ok=True)
     for _date in pd.date_range(start=period["start"], end=period["end"], freq="D").date:
         day = _date.strftime("%Y %m %d")
         WRF_SH, WRF_LH, _, _ = prep_DUCT_inputs(
@@ -182,13 +180,13 @@ def generate_output(gen_fleet, period, unit="MW"):
         )
 
         day = _date.strftime("%Y%m%d")
-        with open(os.path.join(output_path, f"SH_{day}.geojson"), "w") as f:
+        with open(os.path.join(output, f"SH_{day}.geojson"), "w") as f:
             json.dump(to_geojson(WRF_SH, unit), f, indent=2)
-        with open(os.path.join(output_path, f"LH_{day}.geojson"), "w") as f:
+        with open(os.path.join(output, f"LH_{day}.geojson"), "w") as f:
             json.dump(to_geojson(WRF_LH, unit), f, indent=2)
 
 
-def main(database: str, demand: str) -> None:
+def main(database: str, demand: str, output: str) -> None:
     update_config(database, demand)
     paths, period = initialise_script()
     output_path = os.path.join(paths, "Scripts")
@@ -204,7 +202,7 @@ def main(database: str, demand: str) -> None:
     calc_pp_heat(gen_fleet, results)
 
     # 4. Create outputs
-    generate_output(gen_fleet, period)
+    generate_output(output, gen_fleet, period)
 
 
 if __name__ == "__main__":
@@ -214,6 +212,7 @@ if __name__ == "__main__":
 
     parser.add_argument("database", type=str, help="path to power plant database")
     parser.add_argument("demand", type=str, help="path to demand file")
+    parser.add_argument("--output", type=str, help="path to output", default="./output")
 
     args = parser.parse_args()
-    main(database=args.database, demand=args.demand)
+    main(database=args.database, demand=args.demand, output=args.output)
