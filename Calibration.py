@@ -753,17 +753,17 @@ def prepare_save_file(outfile):
     MTTF_USED=pd.DataFrame(columns=['Param ' + i for i in List1])
     AF_USED=pd.DataFrame(columns=['Param ' + i for i in List2])
     
-    # File to save results
     OUT_FILE = outfile
-    of_connection = open(OUT_FILE, 'w')
-    writer = csv.writer(of_connection)
+    os.makedirs(os.path.dirname(outfile), exist_ok=True)
+    # File to save results
+    with open(outfile, 'w') as f:
+        writer = csv.writer(f)
 
-    # Write the headers to the file
-    #writer.writerow(header+header0+header1+header2+list(RAN)+list(RESULTS_GEN_SHARE.keys())+list(MTTF_USED.keys())
-    #                +list(AF_USED.keys())+['loss']+List+List1+List2)
-    writer.writerow(header+header0+list(RAN)+list(RESULTS_GEN_SHARE.keys())+list(MTTF_USED.keys())
-                    +list(AF_USED.keys())+['loss']+List+List1+List2)
-    of_connection.close()
+        # Write the headers to the file
+        #writer.writerow(header+header0+header1+header2+list(RAN)+list(RESULTS_GEN_SHARE.keys())+list(MTTF_USED.keys())
+        #                +list(AF_USED.keys())+['loss']+List+List1+List2)
+        writer.writerow(header+header0+list(RAN)+list(RESULTS_GEN_SHARE.keys())+list(MTTF_USED.keys())
+                        +list(AF_USED.keys())+['loss']+List+List1+List2)
 
 def prepare_save_file_studies(outfile):
     #To use with calc_score_studies(dynamic_params)
