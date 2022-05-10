@@ -1,5 +1,6 @@
 import argparse
 import configparser
+from datetime import date, datetime
 import json
 import re
 import sys
@@ -97,7 +98,7 @@ def calibration(output_path: str, max_evals: int):
     return params, seed
 
 
-def run_simulation(params, seed, period):
+def run_simulation(params, seed, start, end):
     from genDispatch import solve, set_scenario, set_period
     from gd_core import PPdb, reinit_fleet
 
@@ -105,7 +106,7 @@ def run_simulation(params, seed, period):
     PPdb["randseeds"] = seed
     gen_fleet = reinit_fleet()
 
-    set_period(period["start"], period["end"])
+    set_period(start, end)
     set_scenario({"sys demand": SCENARIO_NAME})
 
     results = solve(
@@ -164,29 +165,27 @@ def to_geojson(dataframe: pd.DataFrame, unit: str) -> Dict:
     return geometries
 
 
-def generate_output(output: str, gen_fleet, period, unit="MW"):
+def generate_output(output: str, gen_fleet, day: date, unit="MW"):
     from ToWRF import prep_DUCT_inputs
 
     os.makedirs(output, exist_ok=True)
-    for _date in pd.date_range(start=period["start"], end=period["end"], freq="D").date:
-        day = _date.strftime("%Y %m %d")
-        WRF_SH, WRF_LH, _, _ = prep_DUCT_inputs(
-            scenario=SCENARIO_NAME,
-            GenFleet=gen_fleet,
-            PPcells_only=True,
-            With_height=True,
-            unit=unit,
-            day=day,
-        )
+    day = day.strftime("%Y %m %d")
+    WRF_SH, WRF_LH, _, _ = prep_DUCT_inputs(
+        scenario=SCENARIO_NAME,
+        GenFleet=gen_fleet,
+        PPcells_only=True,
+        With_height=True,
+        unit=unit,
+        day=day,
+    )
 
-        day = _date.strftime("%Y%m%d")
-        with open(os.path.join(output, f"SH_{day}.geojson"), "w") as f:
-            json.dump(to_geojson(WRF_SH, unit), f, indent=2)
-        with open(os.path.join(output, f"LH_{day}.geojson"), "w") as f:
-            json.dump(to_geojson(WRF_LH, unit), f, indent=2)
+    with open(os.path.join(output, f"SH.geojson"), "w") as f:
+        json.dump(to_geojson(WRF_SH, unit), f, indent=2)
+    with open(os.path.join(output, f"LH.geojson"), "w") as f:
+        json.dump(to_geojson(WRF_LH, unit), f, indent=2)
 
 
-def main(database: str, demand: str, output: str) -> None:
+def main(database: str, demand: str, day: date, output: str) -> None:
     update_config(database, demand)
     paths, period = initialise_script()
     output_path = os.path.join(paths, "Scripts")
@@ -196,23 +195,24 @@ def main(database: str, demand: str, output: str) -> None:
     params, seed = calibration(output_path, 3)
 
     # 2. Simulation
-    gen_fleet, results = run_simulation(params, seed, period)
+    gen_fleet, results = run_simulation(params, seed, day, day)
 
     # 3. Calculate heat
     calc_pp_heat(gen_fleet, results)
 
     # 4. Create outputs
-    generate_output(output, gen_fleet, period)
+    generate_output(output, gen_fleet, day)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Runs Power Plant simulation and returns heat values."
+        description="Runs Power Plant simulation and returns heat values for a particular day."
     )
 
     parser.add_argument("database", type=str, help="path to power plant database")
     parser.add_argument("demand", type=str, help="path to demand file")
+    parser.add_argument("day", type=lambda s: datetime.strptime(s, '%Y%m%d').date(), help="day to simulate (YYYYMMDD)")
     parser.add_argument("--output", type=str, help="path to output", default="./output")
 
     args = parser.parse_args()
-    main(database=args.database, demand=args.demand, output=args.output)
+    main(database=args.database, demand=args.demand, day=args.day, output=args.output)
