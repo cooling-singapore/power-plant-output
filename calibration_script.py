@@ -1,7 +1,6 @@
 import argparse
-import configparser
 from datetime import date, datetime
-import re
+from shutil import copyfile
 import sys
 import os
 
@@ -117,12 +116,9 @@ def calibration(output_path: str, max_evals: int):
     )
 
     prepare_save_file(progress_file)
-    best, params, seeds = Calibration(max_evals, progress_file)
+    best, _, _ = Calibration(max_evals, progress_file)
 
-    best_params = params[best - 1].copy()
-    best_seed = seeds[best - 1].copy()
-
-    return best_params, best_seed
+    return best
 
 
 def main(demand: str, market_year: date, output: str) -> None:
@@ -132,10 +128,12 @@ def main(demand: str, market_year: date, output: str) -> None:
     # Calibration
     output_path = os.path.join(project_path, "Scripts")
     pre_calibration(output_path, 2)
-    params, seed = calibration(output_path, 3)
+    best = calibration(output_path, 3)
 
-    print(f"{params=}")
-    print(f"{seed=}")
+    from Calibration import save_results
+    results_path =  save_results(best)
+    # Copy database to specified path
+    copyfile(os.path.join(results_path, "Calibrated_database.xlsx"), output)
 
 
 if __name__ == "__main__":

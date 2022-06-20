@@ -956,8 +956,7 @@ def store_results_old(max_evals):
 
 def save_results(run):
     #run is the run no. in the excel 
-    from datetime import datetime, timedelta
-    import openpyxl
+    from datetime import datetime
     
     global CALIBRATED_STATIONS, CALIBRATED_PARAMS, CALIBRATED_RANDSEEDS, PARAMS_DFS, RANDSEEDS_DFS  
 
@@ -977,11 +976,10 @@ def save_results(run):
         CALIBRATED_PARAMS.to_excel(writer, sheet_name='Plant Parameters')
         CALIBRATED_RANDSEEDS.to_excel(writer, sheet_name='Random Seeds')
 
-    file_name = output_path+'calibration_results.csv'
     file_name_new = output_path+'calibration_results_new.csv'
-    # store_results_old(max_evals).to_csv(file_name, index=False)
     File_in_progress = path.join(PATHS['Proj'],'Scripts', 'In_Progress', 'calibration_in_progress.csv')
     store_results(File_in_progress).to_csv(file_name_new, index=False)
-    print('\nCalibration results saved' )
-    return
+    print(f'Calibration results saved in folder: {output_path}')
+
+    return output_path
 
