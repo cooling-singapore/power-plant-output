@@ -2,8 +2,6 @@ import pandas as pd
 
 
 def create_mkt_data_for_sim_year(dFundamentals, data_year_to_use, sim_year):
-    df2 = pd.Series()
-
     # Changing Forex
     dFundamentals["forex"].val = dFundamentals["forex"].val[str(data_year_to_use)]
     dFundamentals["forex"].val.index = dFundamentals["forex"].val.index + pd.DateOffset(
@@ -21,7 +19,6 @@ def create_mkt_data_for_sim_year(dFundamentals, data_year_to_use, sim_year):
 
     dFundamentals["forex"].time_params["t_start"] = dFundamentals["forex"].val.index[0]
     dFundamentals["forex"].time_params["t_end"] = dFundamentals["forex"].val.index[-1]
-    dFundamentals["forex"]
 
     # Changing Fuel Prices
     for item in dFundamentals["fuel prices"]:
