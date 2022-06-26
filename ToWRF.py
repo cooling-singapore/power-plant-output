@@ -857,7 +857,7 @@ def prep_DUCT_inputs(GenFleet, day, WRF_cell_area=300*300, scenario=None, unit='
 
 	for idx, gen in enumerate(GenFleet):
 		# a) Get the 24-h profile of heat streams [W/m^2]
-		sens_air, lath_air, seawater = toWRF_vector(gen.heatstreams_bykind[day], _scalar)
+		sens_air, lath_air, seawater = toWRF_vector(gen.heatstreams_bykind.loc[day], _scalar)
 
 		# b) Get the WRF cell id
 		WRF_cell_id = PPlocs.at[idx, 'WRF cell id']
@@ -868,7 +868,7 @@ def prep_DUCT_inputs(GenFleet, day, WRF_cell_area=300*300, scenario=None, unit='
 		WRF_Sea.loc[WRF_cell_id, Sea_24h_cols] += seawater
 
 		# d) Check -- accumulate the total energy (MWh)
-		total_MWh += gen.heatstreams_bykind[day].sum() * c_['period hr']
+		total_MWh += gen.heatstreams_bykind.loc[day].sum() * c_['period hr']
 
 	# Check that the energies match
 	if not abs(WRF_SH.loc[:, SH_24h_cols].sum().sum() / _scalar
