@@ -42,6 +42,7 @@ def initialise_script(demand: str, market_year: date, day: date) -> None:
     # Changing the simulation period
     gd_core.time.update(
         {
+            "common period": [date_start, date_end],
             "simulation period": [date_start, date_end],
             "D_index": pd.period_range(date_start, date_end, freq="D"),
             "DxP_index": pd.period_range(

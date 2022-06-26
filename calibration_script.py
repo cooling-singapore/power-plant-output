@@ -12,32 +12,49 @@ sys.path.append(".")
 
 
 def initialise_script(demand: str, market_year: date):
-    from gd_core import PATHS, dFundamentals, PPdispatchError
-    import Calibration
-
-    if PPdispatchError is not None:
-        raise PPdispatchError
-
     # Read user provided demand
     demand_df = pd.read_csv(demand, index_col=0, parse_dates=True)
     demand_year = int(demand_df.index.year[0])
+    date_start = demand_df.index[0]
+    date_end = demand_df.index[-1]
+
+    import gd_core
+
+    if gd_core.PPdispatchError is not None:
+        raise gd_core.PPdispatchError
 
     # Update sys demand
-    dFundamentals["sys demand"].val = demand_df
-    dFundamentals["sys demand"].time_params["t_start"] = demand_df.index[0]
-    dFundamentals["sys demand"].time_params["t_end"] = demand_df.index[-1]
+    gd_core.dFundamentals["sys demand"].val = demand_df
+    gd_core.dFundamentals["sys demand"].time_params["t_start"] = date_start
+    gd_core.dFundamentals["sys demand"].time_params["t_end"] = date_end
 
     # Set market data
-    dFundamentals = create_mkt_data_for_sim_year(
-        dFundamentals, market_year.year, demand_year
+    gd_core.dFundamentals = create_mkt_data_for_sim_year(
+        gd_core.dFundamentals, market_year.year, demand_year
+    )
+
+    # Changing the simulation period
+    gd_core.time.update(
+        {
+            "common period": [date_start, date_end],
+            "simulation period": [date_start, date_end],
+            "D_index": pd.period_range(date_start, date_end, freq="D"),
+            "DxP_index": pd.period_range(
+                date_start,
+                date_end,
+                freq=gd_core.time["DxP_freq"],
+            ),
+        }
     )
 
     # Set calibration year match demand
     # FIXME: Remove hardcoded period value in Calibration
+    import Calibration
+
     Calibration.PERIOD_FROM = f"{demand_year} Jan 01"
     Calibration.PERIOD_TO = f"{demand_year} Dec 31"
 
-    return PATHS["Proj"]
+    return gd_core.PATHS["Proj"]
 
 
 def pre_calibration(output_path: str, runs: int):
